@@ -4,7 +4,7 @@ import packets
 from multiprocessing.pool import ThreadPool
 
 CHUNK_SIZE = 1024
-PACKETS = [packets.DNS_PACKET, packets.EMPTY_PACKET, packets.ntp_packet()]
+PACKETS = [packets.DNS_PACKET, packets.EMPTY_PACKET, packets.NTP_PACKET]
 
 
 class PortChecker:
@@ -118,11 +118,12 @@ class PortChecker:
                     protocol = self.recognize_protocol(data)
                     print(f"{port_proto}: {port} {protocol}")
                 except socket.error:
-                    if is_connection and port == 80:
-                        print(f"{port_proto}: {port} HTTP")
-                    elif is_connection and port == 43:
-                        print(f"{port_proto}: {port} WHOIS")
-                    elif is_connection:
+                    if is_connection:
+                        sock.sendto(packets.HTTP_PACKET, (self.hostname, port))
+                        data, _ = sock.recvfrom(1024)
+                        if data.startswith(b"HTTP/1.1"):
+                            print(f"{port_proto}: {port} HTTP")
+                            return
                         print(f"{port_proto}: {port}")
 
     @staticmethod

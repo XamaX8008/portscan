@@ -44,6 +44,11 @@ def ntp_packet() -> bytes:
     return ntp_request
 
 
+def http_packet() -> bytes:
+    return b"GET / HTTP/1.1\r\n\r\n"
+
+
 DNS_PACKET = dns_packet()
 NTP_PACKET = ntp_packet()
+HTTP_PACKET = http_packet()
 EMPTY_PACKET = b""
